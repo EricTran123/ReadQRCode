@@ -1,15 +1,20 @@
 package ReadQRCode;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Utils {
-    public ArrayList<String> imageFilePath(String folderPath) {
+    public ArrayList<String> getImagesPath(String folderPath) {
         ArrayList<String> listImage = new ArrayList<String>();
         File dir = new File(folderPath);
         File[] listFile = dir.listFiles();
@@ -30,7 +35,28 @@ public class Utils {
         }
         return "";
     }
-    public void writeReport() throws IOException {
+    public void writeResult(Sheet sheet) throws IOException {
+        ArrayList<String> listImage = this.getImagesPath(System.getProperty("user.dir") + File.separator + "QRCodeImage");
+        CellStyle hlinkStyle = sheet.getWorkbook().createCellStyle();
+        Font hlinkFont = sheet.getWorkbook().createFont();
+        hlinkFont.setUnderline(XSSFFont.U_SINGLE);
+        hlinkFont.setColor(HSSFColor.HSSFColorPredefined.BLUE.getIndex());
+        hlinkStyle.setFont(hlinkFont);
+        for (int i=1;i <listImage.size() +1;i++){
+        try {
+            Row row = sheet.createRow(i);
+            Cell fileName = row.createCell(0);
+            fileName.setCellValue(listImage.get(i-1));
+            fileName.setCellStyle(hlinkStyle);
+            Cell shortLink = row.createCell(1);
+            shortLink.setCellValue(ReadQRCode.readQRCode(listImage.get(i-1)));
+            shortLink.setCellStyle(hlinkStyle);
+
+        } catch (Exception e) {
+
+        }
+
+        }
 
     }
     public void createFileReport(){
@@ -40,23 +66,45 @@ public class Utils {
         XSSFWorkbook workbook = null;
         try {
             if (file.exists()){
-                fileInputStream = new FileInputStream(currentDir + "Result.xlsx");
-                POIFSFileSystem fsPoi = new POIFSFileSystem(fileInputStream);
-            } else {
-                file.createNewFile();
-                workbook = new XSSFWorkbook();
-                XSSFSheet sheet = workbook.createSheet("Result");
+               file.delete();
             }
+            file.createNewFile();
+            workbook = new XSSFWorkbook();
+            XSSFSheet sheet = workbook.createSheet("Result");
+            this.createHeaderRow(sheet);
+            this.writeResult(sheet);
             FileOutputStream outputStream = new FileOutputStream(currentDir + "Result.xlsx");
             workbook.write(outputStream);
-            workbook.close();
+
         } catch (FileNotFoundException e){
 
         } catch (IOException e){
 
+        } finally {
+            try {
+                workbook.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+    }
+    public void createHeaderRow(Sheet sheet){
+        try {
+            CellStyle cellStyle = sheet.getWorkbook().createCellStyle();
+            cellStyle.setFillForegroundColor(IndexedColors.GREEN.getIndex());
+            cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            cellStyle.setBorderRight(BorderStyle.DASH_DOT);
+            Row row = sheet.createRow(0);
+            Cell fileNameRow = row.createCell(0);
+            fileNameRow.setCellValue("FileName");
+            fileNameRow.setCellStyle(cellStyle);
+            Cell shortLink = row.createCell(1);
+            shortLink.setCellValue("ShortLink");
+            shortLink.setCellStyle(cellStyle);
 
-
+        } catch (Exception e){
+            e.getStackTrace();
+        }
     }
 
 }
