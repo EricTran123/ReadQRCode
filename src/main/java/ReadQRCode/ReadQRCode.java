@@ -12,7 +12,7 @@ import java.util.Hashtable;
 import java.util.Map;
 
 public class ReadQRCode {
-    public static String readQRCode (String filePath) throws FileNotFoundException, IOException, NotFoundException{
+    public static String readQRCode (String filePath) throws IOException, NotFoundException{
         Hashtable<DecodeHintType, Object> hintMap = new Hashtable<DecodeHintType, Object>();
         hintMap.put(DecodeHintType.TRY_HARDER, Boolean.TRUE);
         BinaryBitmap binaryBitmap = new BinaryBitmap(new HybridBinarizer(

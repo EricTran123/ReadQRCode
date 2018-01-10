@@ -73,6 +73,8 @@ public class Utils {
             XSSFSheet sheet = workbook.createSheet("Result");
             this.createHeaderRow(sheet);
             this.writeResult(sheet);
+            sheet.autoSizeColumn(0);
+            sheet.autoSizeColumn(1);
             FileOutputStream outputStream = new FileOutputStream(currentDir + "Result.xlsx");
             workbook.write(outputStream);
 
@@ -94,13 +96,21 @@ public class Utils {
             cellStyle.setFillForegroundColor(IndexedColors.GREEN.getIndex());
             cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
             cellStyle.setBorderRight(BorderStyle.DASH_DOT);
+            cellStyle.setAlignment(HorizontalAlignment.CENTER);
             Row row = sheet.createRow(0);
             Cell fileNameRow = row.createCell(0);
             fileNameRow.setCellValue("FileName");
             fileNameRow.setCellStyle(cellStyle);
-            Cell shortLink = row.createCell(1);
-            shortLink.setCellValue("ShortLink");
-            shortLink.setCellStyle(cellStyle);
+            Cell originalLink = row.createCell(1);
+            originalLink.setCellValue("OriginalLink");
+            originalLink.setCellStyle(cellStyle);
+            Cell alias = row.createCell(2);
+            alias.setCellValue("Alias");
+            alias.setCellStyle(cellStyle);
+            Cell shortlink = row.createCell(3);
+            shortlink.setCellValue("Shortlink");
+            shortlink.setCellStyle(cellStyle);
+
 
         } catch (Exception e){
             e.getStackTrace();
